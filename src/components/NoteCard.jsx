@@ -5,6 +5,7 @@ import CardHeader from "@mui/material/CardHeader";
 import { AddCircleOutlineOutlined, DeleteOutlined } from "@mui/icons-material";
 import IconButton from "@mui/material/IconButton";
 import { Typography } from "@mui/material";
+import { NoteCardClasses } from "./Utils";
 
 
 const NoteCard = ({ note, handleDelete }) => {
@@ -13,7 +14,7 @@ const NoteCard = ({ note, handleDelete }) => {
   return (
     <>
       <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-        <Card>
+        <Card sx={NoteCardClasses.card(note)}>
           <CardHeader
             action={
               <IconButton aria-label="delete-button" onClick={() => handleDelete(id)}>

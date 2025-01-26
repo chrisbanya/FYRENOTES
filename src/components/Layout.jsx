@@ -8,39 +8,21 @@ import ListItemButton from "@mui/material/ListItemButton";
 import { AddCircleOutlineOutlined, SubjectOutlined } from "@mui/icons-material";
 import { ListItemText } from "@mui/material";
 import { useLocation, useNavigate } from "react-router";
-const drawerWidth = 240;
-const classes = {
-  drawer: {
-    width: drawerWidth,
-    ".MuiDrawer-paper": {
-      width: drawerWidth,
-    },
-  },
-  root: {
-    display: "flex",
-  },
-  layoutEffect: {
-    backgroundColor: "#f9f9f9",
-    width: "100%",
-  },
-};
-const menuItems = [
-  { text: "MyNotes", icon: <SubjectOutlined color="secondary" />, path: "/" },
-  {
-    text: "Create Notes",
-    icon: <AddCircleOutlineOutlined color="secondary" />,
-    path: "/create",
-  },
-];
+import menuItems from "./MenuItems";
+import { LayoutClasses} from "./Utils";
+
+
 
 const Layout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   return (
-    <Box sx={classes.root}>
-      <Drawer sx={classes.drawer} variant="permanent" anchor="left">
+    <Box sx={LayoutClasses.root}>
+      <Drawer sx={LayoutClasses.drawer} variant="permanent" anchor="left">
         <div>
-          <Typography variant="h5">Notes</Typography>
+          <Typography variant="h5" sx={LayoutClasses.title} color="secondary">
+            Notes
+          </Typography>
         </div>
         {/* sidebar list items */}
         <List>
@@ -58,7 +40,7 @@ const Layout = ({ children }) => {
         </List>
       </Drawer>
       {/* output for either create or notes pages */}
-      <Box sx={classes.layoutEffect}>{children}</Box>
+      <Box sx={LayoutClasses.layoutEffect}>{children}</Box>
     </Box>
   );
 };
