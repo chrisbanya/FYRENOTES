@@ -4,36 +4,38 @@ import { Notes } from "./pages/Notes";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { purple } from "@mui/material/colors";
 import Layout from "./components/Layout";
-
+import LogIn from "./pages/LogIn";
+import Register from "./pages/Register";
 
 const theme = createTheme({
- palette: {
-  primary:{
-    main: "#9c27b0"
+  palette: {
+    primary: {
+      main: "#9c27b0",
+    },
+    secondary: purple,
   },
-  secondary: purple
- }, 
- typography: {
-  fontFamily: 'Quicksand',
-  fontWeightLight: 400,
-  fontWeightRegular: 500,
-  fontWeightBold: 700,
-  fontWeightMedium: 600
- }
-})
+  typography: {
+    fontFamily: "Quicksand",
+    fontWeightLight: 400,
+    fontWeightRegular: 500,
+    fontWeightBold: 700,
+    fontWeightMedium: 600,
+  },
+});
 
 function App() {
   return (
     <>
       <ThemeProvider theme={theme}>
-
         <Router>
-          <Layout>
-            <Routes>
-              <Route exact path="/" element={<Notes />} />
-              <Route path="/Create" element={<Create />} />
-            </Routes>
-          </Layout>
+          <Routes>
+            <Route path="/LogIn" element={<LogIn />} />
+            <Route path="/Register" element={<Register/>} />
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Notes />} />
+              <Route path="Create" element={<Create />} />
+            </Route>
+          </Routes>
         </Router>
       </ThemeProvider>
     </>
