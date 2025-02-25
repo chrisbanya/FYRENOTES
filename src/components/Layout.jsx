@@ -5,19 +5,28 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemButton from "@mui/material/ListItemButton";
-import { AddCircleOutlineOutlined, SubjectOutlined } from "@mui/icons-material";
 import { ListItemText } from "@mui/material";
-import { useLocation, useNavigate } from "react-router";
+import { Outlet, useLocation, useNavigate } from "react-router";
 import menuItems from "./MenuItems";
 import { LayoutClasses} from "./Utils";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
 
 
-
-const Layout = ({ children }) => {
+const Layout = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  
   return (
     <Box sx={LayoutClasses.root}>
+      <AppBar sx={LayoutClasses.appBar}>
+        <Toolbar>
+          <Typography>welcome to DevChris notes website</Typography>
+        </Toolbar>
+      </AppBar>
+      <Box sx={LayoutClasses.toolbar}></Box>
+
       <Drawer sx={LayoutClasses.drawer} variant="permanent" anchor="left">
         <div>
           <Typography variant="h5" sx={LayoutClasses.title} color="secondary">
@@ -39,8 +48,11 @@ const Layout = ({ children }) => {
           ))}
         </List>
       </Drawer>
-      {/* output for either create or notes pages */}
-      <Box sx={LayoutClasses.layoutEffect}>{children}</Box>
+      {/* outlet for create and notes pages */}
+
+      <Box sx={LayoutClasses.layoutEffect}>
+        <Outlet/>
+      </Box>
     </Box>
   );
 };
