@@ -1,4 +1,3 @@
-
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
@@ -10,7 +9,11 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import Radio from "@mui/material/Radio";
-import {useNavigate} from 'react-router'
+import CircularProgress from "@mui/material/CircularProgress";
+import { Box } from "@mui/material";
+import { db } from "../firebase/config";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { auth } from "../firebase/config";
 
 export const Create = () => {
   const [title, setTitle] = useState("");
@@ -18,10 +21,12 @@ export const Create = () => {
   const [titleError, setTitleError] = useState(false);
   const [detailsError, setDetailsError] = useState(false);
   const [category, setCategory] = useState("reminders");
-  const navigate = useNavigate()
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+    setIsLoading(true);
     setTitleError(false);
     setDetailsError(false);
     if (title == "") {
@@ -30,18 +35,40 @@ export const Create = () => {
     if (details == "") {
       setDetailsError(true);
     }
-
+    const user = auth?.currentUser;
+    if (!user) {
+      alert("You need to be logged in to add a note");
+      return;
+    }
     if (title && details) {
-     fetch("http://localhost:8000/notes", {
-      method: 'POST',
-      headers: {'Content-type': 'application/json'},
-      body: JSON.stringify({title, details, category})
-     }).then(() => navigate('/') );
+      try {
+        await addDoc(collection(db, "notes"), {
+          title,
+          details,
+          category,
+          createdAt: serverTimestamp(),
+          userId: user.uid,
+        });
+        setIsLoading(false);
+        setTitle("");
+        setDetails("");
+        alert("notes added successfully");
+      } catch (e) {
+        setError(e.message);
+        setIsLoading(false);
+      }
+    } else {
+      setIsLoading(false);
     }
   }
   return (
     <>
       <Container>
+        {isLoading && (
+          <Box xs={12}>
+            <CircularProgress color="secondary" size="5rem" />
+          </Box>
+        )}
         <Typography
           gutterBottom
           color="danger"
@@ -60,6 +87,7 @@ export const Create = () => {
             fullWidth
             required
             error={titleError}
+            value={title}
             onChange={(e) => setTitle(e.target.value)}
             sx={{
               marginTop: 3,
@@ -73,6 +101,7 @@ export const Create = () => {
             required
             multiline
             rows={4}
+            value={details}
             error={detailsError}
             onChange={(e) => setDetails(e.target.value)}
             sx={{
@@ -114,9 +143,13 @@ export const Create = () => {
           >
             Submit
           </Button>
+          {error && (
+            <Typography variant="subtitle1" align="center" color="error">
+              {error}
+            </Typography>
+          )}
         </form>
       </Container>
     </>
   );
 };
-
