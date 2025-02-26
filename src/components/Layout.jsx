@@ -8,23 +8,47 @@ import ListItemButton from "@mui/material/ListItemButton";
 import { ListItemText } from "@mui/material";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import menuItems from "./MenuItems";
-import { LayoutClasses} from "./Utils";
+import { LayoutClasses } from "./Utils";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-
+import SignOutBtn from "./SignOutBtn";
+import Stack from "@mui/material/Stack";
+import { auth } from "../firebase/config";
 
 const Layout = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const user = auth?.currentUser?.email;
 
-  
   return (
     <Box sx={LayoutClasses.root}>
       <AppBar sx={LayoutClasses.appBar}>
         <Toolbar>
-          <Typography>welcome to DevChris notes website</Typography>
+          <Stack
+            direction="row"
+            sx={{
+              justifyContent: "space-between",
+              alignItems: "center",
+              width: "100%",
+            }}
+          >
+            <Box>
+              <Typography>Welcome to DevChris notes website</Typography>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "2rem",
+              }}
+            >
+              <Typography>{user}</Typography>
+              <SignOutBtn />
+            </Box>
+          </Stack>
         </Toolbar>
       </AppBar>
+      {/* margin between appBar and content */}
       <Box sx={LayoutClasses.toolbar}></Box>
 
       <Drawer sx={LayoutClasses.drawer} variant="permanent" anchor="left">
@@ -51,7 +75,7 @@ const Layout = () => {
       {/* outlet for create and notes pages */}
 
       <Box sx={LayoutClasses.layoutEffect}>
-        <Outlet/>
+        <Outlet />
       </Box>
     </Box>
   );
