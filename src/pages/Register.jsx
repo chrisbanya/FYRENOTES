@@ -6,8 +6,12 @@ import {
   Container,
   Paper,
 } from "@mui/material";
-import { LogInStyle } from "../components/Utils";
+import CircularProgress from "@mui/material/CircularProgress";
+import { CredentialStyle } from "../components/Utils";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase/config";
 
 const Register = () => {
   const [credentials, setCredentials] = useState({
@@ -18,32 +22,64 @@ const Register = () => {
   const [usernameError, setUsernameError] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   function handleChange(e) {
+    setError("");
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
-    console.log(credentials);
   }
 
   function handleSubmit(e) {
     e.preventDefault();
     setUsernameError(false);
     setPasswordError(false);
+    setEmailError(false);
+
     if (credentials.username == "") {
       setUsernameError(true);
     }
     if (credentials.email == "") {
-        setEmailError(true)
+      setEmailError(true);
     }
     if (credentials.password == "") {
       setPasswordError(true);
     }
-    if (credentials.username !== "" && credentials.email !=="" && credentials.password !== "") {
-      console.log(credentials);
+
+    if (
+      credentials.username !== "" &&
+      credentials.email !== "" &&
+      credentials.password !== ""
+    ) {
+      setIsLoading(true);
+      createUserWithEmailAndPassword(
+        auth,
+        credentials.email,
+        credentials.password
+      )
+        .then((userCredential) => {
+          // Signed up
+          const user = userCredential.user;
+
+          setIsLoading(false);
+          setTimeout(() => navigate("/LogIn"), 3000);
+        })
+        .catch((error) => {
+          setError(error.message);
+          setIsLoading(false);
+        });
     }
   }
   return (
     <Container component="main" maxWidth="xs">
-      <Box sx={LogInStyle.center}>
+      <Box sx={CredentialStyle.center}>
+        {/* loading spinner display while firebase call is in process */}
+        {isLoading && (
+          <Box xs={12}>
+            <CircularProgress color="secondary" size="5rem" />
+          </Box>
+        )}
         <Paper elevation={3} sx={{ padding: 3 }}>
           <Typography component="h1" variant="h5" align="center">
             Register
@@ -87,7 +123,9 @@ const Register = () => {
                 autoComplete="current-password"
                 error={passwordError}
                 onChange={handleChange}
-                helperText={passwordError ? "Passwords must be atleast 6 characters" : ""}
+                helperText={
+                  passwordError ? "Passwords must be atleast 6 characters" : ""
+                }
               />
               <Button
                 type="submit"
@@ -98,8 +136,13 @@ const Register = () => {
               >
                 Login
               </Button>
+              {error && (
+                <Typography variant="subtitle1" align="center" color="error">
+                  {error}
+                </Typography>
+              )}
               <Typography component="h3" variant="subtitle1" align="center">
-                Already have an account?{" "} 
+                Already have an account? <Link to="/LogIn">Log In</Link>
               </Typography>
             </form>
           </Box>
