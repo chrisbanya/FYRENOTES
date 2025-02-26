@@ -1,4 +1,3 @@
-
 import { SubjectOutlined, AddCircleOutlineOutlined } from "@mui/icons-material";
 
 const menuItems = [
@@ -9,5 +8,4 @@ const menuItems = [
     path: "/create",
   },
 ];
-
 export default menuItems;
