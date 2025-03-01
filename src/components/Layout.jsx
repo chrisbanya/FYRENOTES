@@ -50,14 +50,14 @@ const Layout = () => {
           <Stack
             direction="row"
             sx={{
-              justifyContent: "space-between",
+              justifyContent: "flex-end",
               alignItems: "center",
               width: "100%",
             }}
           >
-            <Box>
+            {/* <Box>
               <Typography>Welcome to DevChris notes website</Typography>
-            </Box>
+            </Box> */}
             <Box
               sx={{
                 display: "flex",
