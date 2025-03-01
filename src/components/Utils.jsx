@@ -1,3 +1,4 @@
+import { blue,  green, red, yellow } from "@mui/material/colors";
 import Swal from "sweetalert2";
 // Notecard file styles
 export const NoteCardClasses = {
@@ -7,6 +8,24 @@ export const NoteCardClasses = {
     }
     return {};
   },
+  avatar: (note) => {
+    if (note.category == "reminders") {
+      return {
+        backgroundColor: blue[500]
+      }
+    }
+    if (note.category == "todos") {
+      return {
+        backgroundColor: yellow[700],
+      };
+    }
+    if (note.category == "work") {
+      return {
+        backgroundColor: red[500]
+      }
+    }
+  return {backgroundColor: green[500]}
+  }
 };
 //Layout file styles
 export const drawerWidth = 240;
