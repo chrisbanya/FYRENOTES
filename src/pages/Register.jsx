@@ -87,7 +87,18 @@ const Register = () => {
       // To do: share credentials state so its aready prefilled when navigated to sign in
       setTimeout(() => navigate("/LogIn"), 2000);
     } catch (error) {
-      setError(error.message);
+       const errorMessages = {
+         "auth/user-not-found": "No account found with this email.",
+         "auth/wrong-password": "Incorrect password. Try again!",
+         "auth/invalid-email": "Invalid email format.",
+         "auth/user-disabled": "This account has been disabled.",
+         "auth/too-many-requests": "Too many failed attempts. Try again later.",
+       };
+
+       // Default to Firebase error message if no custom message is found
+       const errorMessage = errorMessages[error.code] || error.message;
+
+      setError(errorMessage);
       setIsLoading(false);
     }
   }

@@ -71,12 +71,23 @@ const LogIn = () => {
         });
         setTimeout(() => navigate("/"), 2000);
       } catch (error) {
-        // ToDo: implement custom error codes
+         const errorMessages = {
+           "auth/user-not-found": "No account found with this email.",
+           "auth/wrong-password": "Incorrect password. Try again!",
+           "auth/invalid-email": "Invalid email format.",
+           "auth/user-disabled": "This account has been disabled.",
+           "auth/too-many-requests":
+             "Too many failed attempts. Try again later.",
+         };
+
+         // Defaults to Firebase error message if no custom message is found
+         const errorMessage = errorMessages[error.code] || error.message;
+
         Swal.fire({
           icon: "error",
           iconColor: "#9c27b0",
           title: "Login Failed",
-          text: error.message,
+          text: errorMessage,
           showConfirmButton: true,
           customClass: {
             title: "swal-title",
