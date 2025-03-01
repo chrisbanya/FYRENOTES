@@ -9,11 +9,13 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import Radio from "@mui/material/Radio";
-import CircularProgress from "@mui/material/CircularProgress";
-import { Box } from "@mui/material";
 import { db } from "../firebase/config";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { auth } from "../firebase/config";
+import Swal from "sweetalert2";
+import { Toast } from "../components/Utils";
+import CircularProgress from "../components/CircularProgressComp";
+import ErrorComp from "../components/ErrorComp";
 
 export const Create = () => {
   const [title, setTitle] = useState("");
@@ -29,46 +31,66 @@ export const Create = () => {
     setIsLoading(true);
     setTitleError(false);
     setDetailsError(false);
-    if (title == "") {
+
+    if (!title.trim()) {
       setTitleError(true);
     }
-    if (details == "") {
+    if (!details.trim()) {
       setDetailsError(true);
     }
-    const user = auth?.currentUser;
-    if (!user) {
-      alert("You need to be logged in to add a note");
+    // if input fields are empty stop execution
+    if (!title.trim() || !details.trim()) {
+      setIsLoading(false);
       return;
     }
-    if (title && details) {
-      try {
-        await addDoc(collection(db, "notes"), {
-          title,
-          details,
-          category,
-          createdAt: serverTimestamp(),
-          userId: user.uid,
-        });
-        setIsLoading(false);
-        setTitle("");
-        setDetails("");
-        alert("notes added successfully");
-      } catch (e) {
-        setError(e.message);
-        setIsLoading(false);
-      }
-    } else {
+    const user = auth?.currentUser;
+
+    if (!user) {
+      Swal.fire({
+        title: "Not Logged In",
+        text: "You need to be logged in to add a note",
+        icon: "info",
+        iconColor: "#9c27b0",
+        showCloseButton: "true",
+        customClass: {
+          title: "swal-title",
+          popup: "swal-popup",
+        },
+      });
+      setIsLoading(false);
+      return;
+    }
+    // note creation process
+    try {
+      await addDoc(collection(db, "notes"), {
+        title,
+        details,
+        category,
+        createdAt: serverTimestamp(),
+        userId: user.uid,
+      });
+      setIsLoading(false);
+      setTitle("");
+      setDetails("");
+
+      Toast.fire({
+        icon: "success",
+        iconColor: "#7b1fa2",
+        title: "Notes saved successfully",
+        customClass: {
+          container: "swal-toast-container",
+          title: "swal-toast-title",
+        },
+      });
+    } catch (e) {
+      setError(e.message);
       setIsLoading(false);
     }
   }
   return (
     <>
       <Container>
-        {isLoading && (
-          <Box xs={12}>
-            <CircularProgress color="secondary" size="5rem" />
-          </Box>
-        )}
+        {isLoading && <CircularProgress />}
         <Typography
           gutterBottom
           color="danger"
@@ -144,9 +166,7 @@ export const Create = () => {
             Submit
           </Button>
           {error && (
-            <Typography variant="subtitle1" align="center" color="error">
-              {error}
-            </Typography>
+            <ErrorComp error={error} />
           )}
         </form>
       </Container>
