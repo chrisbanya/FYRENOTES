@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import Grid from "@mui/material/Grid2";
+// import Grid from "@mui/material/Grid2";
 import { Container } from "@mui/material";
 import { auth } from "../firebase/config";
 import CircularProgress from "../components/CircularProgressComp";
-
+import { Masonry } from "@mui/lab";
 import Swal from "sweetalert2";
 import {
   collection,
@@ -96,7 +96,7 @@ export const Notes = () => {
 
   return (
     <Container>
-      <Grid container spacing={3}>
+      <Masonry columns={{xs: 1, sm: 2, md: 3, lg: 4 }} spacing={{ xs: 1, sm: 2, md: 3 }} sequential>
         {isLoading ? (
           <CircularProgress />
         ) : notes.length > 0 ? (
@@ -106,7 +106,7 @@ export const Notes = () => {
         ) : (
           <p>No notes found</p>
         )}
-      </Grid>
+      </Masonry>
     </Container>
   );
 };
