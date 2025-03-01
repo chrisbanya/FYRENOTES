@@ -21,6 +21,11 @@ const theme = createTheme({
     fontWeightBold: 700,
     fontWeightMedium: 600,
   },
+  zIndex: {
+    appBar: 1200, 
+    drawer: 1100,
+    snackbar: 1300, // Ensures the toast notification has a higher z-index
+  },
 });
 
 function App() {
