@@ -6,12 +6,17 @@ import {
   Container,
   Paper,
 } from "@mui/material";
-import CircularProgress from "@mui/material/CircularProgress";
+// import CircularProgress from "@mui/material/CircularProgress";
 import { CredentialStyle } from "../components/Utils";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { setDoc, doc } from "firebase/firestore";
 import { auth } from "../firebase/config";
+import { db } from "../firebase/config";
+import CircularProgressComp from "../components/CircularProgressComp";
+import ErrorComp from "../components/ErrorComp";
+import { Toast } from "../components/Utils";
 
 const Register = () => {
   const [credentials, setCredentials] = useState({
@@ -31,55 +36,74 @@ const Register = () => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setUsernameError(false);
     setPasswordError(false);
     setEmailError(false);
 
-    if (credentials.username == "") {
+    if (!credentials.username.trim()) {
       setUsernameError(true);
     }
-    if (credentials.email == "") {
+    if (!credentials.email.trim()) {
       setEmailError(true);
     }
-    if (credentials.password == "") {
+    if (!credentials.password.trim()) {
       setPasswordError(true);
     }
 
     if (
-      credentials.username !== "" &&
-      credentials.email !== "" &&
-      credentials.password !== ""
+      !credentials.username.trim() &&
+      !credentials.email.trim() &&
+      !credentials.password.trim()
     ) {
       setIsLoading(true);
-      createUserWithEmailAndPassword(
-        auth,
-        credentials.email,
-        credentials.password
-      )
-        .then((userCredential) => {
-          // Signed up
-          const user = userCredential.user;
-
-          setIsLoading(false);
-          setTimeout(() => navigate("/LogIn"), 3000);
-        })
-        .catch((error) => {
-          setError(error.message);
-          setIsLoading(false);
+      try {
+        // user creation
+        const userCredentials = await createUserWithEmailAndPassword(
+          auth,
+          credentials.email,
+          credentials.password
+        );
+        const user = userCredentials.user;
+        // b/cos firebase auth only accepts email and passsword if you want to store additionally info pass to db via setDoc
+        await setDoc(doc(db, "users", user.uid), {
+          username: credentials.username,
+          email: credentials.email,
         });
+
+        setIsLoading(false);
+        Toast.fire({
+          icon: "success",
+          iconColor: "#7b1fa2",
+          title: "Account created successfully!",
+          customClass: {
+            container: "swal-toast-container",
+            title: "swal-toast-title",
+          },
+        });
+        // To do: share credentials state so its aready prefilled when navigated to sign in
+        setTimeout(() => navigate("/LogIn"), 4000);
+      } catch (error) {
+        setError(error.message);
+        setIsLoading(false);
+      }
     }
   }
   return (
     <Container component="main" maxWidth="xs">
       <Box sx={CredentialStyle.center}>
         {/* loading spinner display while firebase call is in process */}
-        {isLoading && (
-          <Box xs={12}>
-            <CircularProgress color="secondary" size="5rem" />
-          </Box>
-        )}
+        {isLoading && <CircularProgressComp />}
+        <Typography
+          component="h1"
+          variant="h5"
+          align="center"
+          color="primary"
+          sx={{ mb: 2 }}
+        >
+          FYRENOTES
+        </Typography>
         <Paper elevation={3} sx={{ padding: 3 }}>
           <Typography component="h1" variant="h5" align="center">
             Register
@@ -136,11 +160,7 @@ const Register = () => {
               >
                 Login
               </Button>
-              {error && (
-                <Typography variant="subtitle1" align="center" color="error">
-                  {error}
-                </Typography>
-              )}
+              {error && <ErrorComp error={error} />}
               <Typography component="h3" variant="subtitle1" align="center">
                 Already have an account? <Link to="/LogIn">Log In</Link>
               </Typography>
