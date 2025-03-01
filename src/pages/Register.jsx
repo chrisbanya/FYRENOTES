@@ -51,43 +51,44 @@ const Register = () => {
     if (!credentials.password.trim()) {
       setPasswordError(true);
     }
-
+    // stop execution if any field is empty
     if (
-      !credentials.username.trim() &&
-      !credentials.email.trim() &&
+      !credentials.username.trim() ||
+      !credentials.email.trim() ||
       !credentials.password.trim()
     ) {
-      setIsLoading(true);
-      try {
-        // user creation
-        const userCredentials = await createUserWithEmailAndPassword(
-          auth,
-          credentials.email,
-          credentials.password
-        );
-        const user = userCredentials.user;
-        // b/cos firebase auth only accepts email and passsword if you want to store additionally info pass to db via setDoc
-        await setDoc(doc(db, "users", user.uid), {
-          username: credentials.username,
-          email: credentials.email,
-        });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      // user creation
+      const userCredentials = await createUserWithEmailAndPassword(
+        auth,
+        credentials.email,
+        credentials.password
+      );
+      const user = userCredentials.user;
+      // b/cos firebase auth only accepts email and passsword if you want to store additionally info, pass to db via setDoc
+      await setDoc(doc(db, "users", user.uid), {
+        username: credentials.username,
+        email: credentials.email,
+      });
 
-        setIsLoading(false);
-        Toast.fire({
-          icon: "success",
-          iconColor: "#7b1fa2",
-          title: "Account created successfully!",
-          customClass: {
-            container: "swal-toast-container",
-            title: "swal-toast-title",
-          },
-        });
-        // To do: share credentials state so its aready prefilled when navigated to sign in
-        setTimeout(() => navigate("/LogIn"), 4000);
-      } catch (error) {
-        setError(error.message);
-        setIsLoading(false);
-      }
+      setIsLoading(false);
+      Toast.fire({
+        icon: "success",
+        iconColor: "#7b1fa2",
+        title: "Account created successfully!",
+        customClass: {
+          container: "swal-toast-container",
+          title: "swal-toast-title",
+        },
+      });
+      // To do: share credentials state so its aready prefilled when navigated to sign in
+      setTimeout(() => navigate("/LogIn"), 2000);
+    } catch (error) {
+      setError(error.message);
+      setIsLoading(false);
     }
   }
   return (
@@ -158,7 +159,7 @@ const Register = () => {
                 color="primary"
                 sx={{ mt: 3, mb: 2 }}
               >
-                Login
+                Register
               </Button>
               {error && <ErrorComp error={error} />}
               <Typography component="h3" variant="subtitle1" align="center">
