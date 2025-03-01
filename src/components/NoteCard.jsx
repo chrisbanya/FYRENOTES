@@ -7,7 +7,6 @@ import IconButton from "@mui/material/IconButton";
 import { Typography } from "@mui/material";
 import { NoteCardClasses } from "./Utils";
 
-
 const NoteCard = ({ note, handleDelete }) => {
   const { title, category, details, id } = note;
 
@@ -15,16 +14,19 @@ const NoteCard = ({ note, handleDelete }) => {
     <>
       <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <Card sx={NoteCardClasses.card(note)}>
-          <CardHeader
+          <CardHeader   
             action={
-              <IconButton aria-label="delete-button" onClick={() => handleDelete(id)} >
+              <IconButton
+                aria-label="delete-button"
+                onClick={() => handleDelete(id)}
+              >
                 <DeleteOutlined />
               </IconButton>
-           }
+            }
             title={title}
             subheader={category}
           />
-        
+
           <CardContent>
             <Typography variant="body2" color="#0f0f00">
               {details}
