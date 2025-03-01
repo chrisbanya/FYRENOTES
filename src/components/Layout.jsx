@@ -13,12 +13,35 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import SignOutBtn from "./SignOutBtn";
 import Stack from "@mui/material/Stack";
-import { auth } from "../firebase/config";
-
+import { auth, db } from "../firebase/config";
+import { doc, getDoc } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+import { useState, useEffect, useCallback } from "react";
 const Layout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const user = auth?.currentUser?.email;
+  const [username, setUsername] = useState("");
+  const [user, setUser] = useState(null);
+
+  // gets the username ref initiated on register component
+  const fetchUsername = useCallback(async (user) => {
+    if (user) {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        setUsername(userDoc.data().username);
+      }
+    }
+  }, []);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        fetchUsername(currentUser);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [fetchUsername]);
 
   return (
     <Box sx={LayoutClasses.root}>
@@ -42,7 +65,7 @@ const Layout = () => {
                 gap: "2rem",
               }}
             >
-              <Typography>{user}</Typography>
+              <Typography>Hello, {username ? username : "Guest"}</Typography>
               <SignOutBtn />
             </Box>
           </Stack>
@@ -54,7 +77,7 @@ const Layout = () => {
       <Drawer sx={LayoutClasses.drawer} variant="permanent" anchor="left">
         <div>
           <Typography variant="h5" sx={LayoutClasses.title} color="secondary">
-            Notes
+            FYRENOTES
           </Typography>
         </div>
         {/* sidebar list items */}
