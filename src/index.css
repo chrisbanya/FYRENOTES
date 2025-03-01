@@ -4,3 +4,14 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.swal-title, .swal-popup, .swal-confirm, .swal-cancel, .swal-toast-title  {
+  font-family: "Quicksand"
+}
+/* overrides sweet alert default loader  */
+.swal2-popup .swal2-loader {
+  border-color: #9c27b0 transparent transparent transparent !important;
+}
+/* ensures toast is above appBar */
+.swal-toast-container {
+  z-index: 2000 !important; 
+}
