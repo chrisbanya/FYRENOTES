@@ -1,3 +1,4 @@
+import Swal from "sweetalert2";
 // Notecard file styles
 export const NoteCardClasses = {
   card: (note) => {
@@ -32,7 +33,9 @@ export const LayoutClasses = {
     width: `calc(100% - ${drawerWidth}px)`,
   },
   toolbar: (theme) => theme.mixins.toolbar,
+  toast: (theme) => theme.zIndex.drawer + 1,
 };
+// Log In & Sign In container styles
 export const CredentialStyle = {
   center: {
     display: "flex",
@@ -42,3 +45,18 @@ export const CredentialStyle = {
     minHeight: "100vh",
   },
 };
+
+export const Toast = Swal.mixin({
+  toast: true,
+  position: "top-end",
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+  customClass: {
+    popup: "swal2-toast"
+  },
+  didOpen: (toast) => {
+    toast.onmouseenter = Swal.stopTimer;
+    toast.onmouseleave = Swal.resumeTimer;
+  },
+});
