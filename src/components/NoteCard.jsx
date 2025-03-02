@@ -1,10 +1,10 @@
-import Grid from "@mui/material/Grid2";
+// import Grid from "@mui/material/Grid2";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import { DeleteOutlined } from "@mui/icons-material";
 import IconButton from "@mui/material/IconButton";
-import { Typography } from "@mui/material";
+import { Avatar, Typography } from "@mui/material";
 import { NoteCardClasses } from "./Utils";
 
 const NoteCard = ({ note, handleDelete }) => {
@@ -12,28 +12,31 @@ const NoteCard = ({ note, handleDelete }) => {
 
   return (
     <>
-      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-        <Card sx={NoteCardClasses.card(note)}>
-          <CardHeader   
-            action={
-              <IconButton
-                aria-label="delete-button"
-                onClick={() => handleDelete(id)}
-              >
-                <DeleteOutlined />
-              </IconButton>
-            }
-            title={title}
-            subheader={category}
-          />
+      <Card sx={NoteCardClasses.card(note)}>
+        <CardHeader
+          avatar={
+            <Avatar sx={NoteCardClasses.avatar(note)}>
+              {category[0].toUpperCase()}
+            </Avatar>
+          }
+          action={
+            <IconButton
+              aria-label="delete-button"
+              onClick={() => handleDelete(id)}
+            >
+              <DeleteOutlined />
+            </IconButton>
+          }
+          title={title}
+          subheader={category}
+        />
 
-          <CardContent>
-            <Typography variant="body2" color="#0f0f00">
-              {details}
-            </Typography>
-          </CardContent>
-        </Card>
-      </Grid>
+        <CardContent>
+          <Typography variant="body2" color="#0f0f00">
+            {details}
+          </Typography>
+        </CardContent>
+      </Card>
     </>
   );
 };
