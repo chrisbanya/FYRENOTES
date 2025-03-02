@@ -32,8 +32,10 @@ export const drawerWidth = 240;
 export const LayoutClasses = {
   drawer: {
     width: drawerWidth,
+    flexShrink: 0,
     ".MuiDrawer-paper": {
       width: drawerWidth,
+      boxSizing: "border-box",
     },
   },
   root: {
@@ -43,13 +45,16 @@ export const LayoutClasses = {
     backgroundColor: "#f9f9f9",
     width: "100%",
     padding: (theme) => theme.spacing(3),
-    marginTop: "60px",
+    marginTop: "64px",
+    
   },
   title: {
     padding: (theme) => theme.spacing(2),
   },
   appBar: {
-    width: `calc(100% - ${drawerWidth}px)`,
+    zIndex: (theme) => theme.zIndex.drawer + 1,
+    width: "100%",
+    // width: `calc(100% - ${drawerWidth}px)`,
   },
   toolbar: (theme) => theme.mixins.toolbar,
   toast: (theme) => theme.zIndex.drawer + 1,
