@@ -1,4 +1,4 @@
-import { blue,  green, red, yellow } from "@mui/material/colors";
+import { blue, green, red, yellow } from "@mui/material/colors";
 import Swal from "sweetalert2";
 // Notecard file styles
 export const NoteCardClasses = {
@@ -11,8 +11,8 @@ export const NoteCardClasses = {
   avatar: (note) => {
     if (note.category == "reminders") {
       return {
-        backgroundColor: blue[500]
-      }
+        backgroundColor: blue[500],
+      };
     }
     if (note.category == "todos") {
       return {
@@ -21,11 +21,11 @@ export const NoteCardClasses = {
     }
     if (note.category == "work") {
       return {
-        backgroundColor: red[500]
-      }
+        backgroundColor: red[500],
+      };
     }
-  return {backgroundColor: green[500]}
-  }
+    return { backgroundColor: green[500] };
+  },
 };
 //Layout file styles
 export const drawerWidth = 240;
@@ -46,7 +46,6 @@ export const LayoutClasses = {
     width: "100%",
     padding: (theme) => theme.spacing(3),
     marginTop: "64px",
-    
   },
   title: {
     padding: (theme) => theme.spacing(2),
@@ -66,7 +65,22 @@ export const CredentialStyle = {
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    minHeight: "100vh",
+    height: "100vh",
+  },
+  gradient: {
+    height: "100vh",
+    background: "linear-gradient(135deg, #9c27b0, #6a1b9a)",
+    position: "relative",
+    overflow: "hidden",
+  },
+  blob: {
+    position: "absolute",
+    width: "150px",
+    height: "150px",
+    background: "rgba(255, 255, 255, 0.3)",
+    borderRadius: "50%",
+    filter: "blur(50px)",
+    animation: "float 6s infinite alternate ease-in-out",
   },
 };
 
@@ -77,7 +91,7 @@ export const Toast = Swal.mixin({
   timer: 3000,
   timerProgressBar: true,
   customClass: {
-    popup: "swal2-toast"
+    popup: "swal2-toast",
   },
   didOpen: (toast) => {
     toast.onmouseenter = Swal.stopTimer;
