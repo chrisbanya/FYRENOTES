@@ -5,6 +5,7 @@ import { auth } from "../firebase/config";
 import CircularProgress from "../components/CircularProgressComp";
 import { Masonry } from "@mui/lab";
 import Swal from "sweetalert2";
+import { onAuthStateChanged } from "firebase/auth";
 import {
   collection,
   query,
@@ -21,7 +22,15 @@ import NoteCard from "../components/NoteCard";
 export const Notes = () => {
   const [notes, setNotes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const user = auth?.currentUser;
+  const [user, setUser] =useState(null)
+  
+  // prevents empty notes on re-render or page refresh
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, [])
 
   useEffect(() => {
     // check for if the user is authenicated else stop the process
