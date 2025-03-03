@@ -17,6 +17,11 @@ import { db } from "../firebase/config";
 import CircularProgressComp from "../components/CircularProgressComp";
 import ErrorComp from "../components/ErrorComp";
 import { Toast } from "../components/Utils";
+import MailOutlineIcon from "@mui/icons-material/MailOutline";
+import InputAdornment from "@mui/material/InputAdornment";
+import { VisibilityOff } from "@mui/icons-material";
+import Visibility from "@mui/icons-material/Visibility";
+import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 
 const Register = () => {
   const [credentials, setCredentials] = useState({
@@ -29,13 +34,17 @@ const Register = () => {
   const [passwordError, setPasswordError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPwd, setShowPwd] = useState(false);
+
   const navigate = useNavigate();
 
   function handleChange(e) {
     setError("");
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   }
-
+  function handleVisibility() {
+    setShowPwd((prev) => !prev);
+  }
   async function handleSubmit(e) {
     e.preventDefault();
     setUsernameError(false);
@@ -84,19 +93,24 @@ const Register = () => {
           title: "swal-toast-title",
         },
       });
-      // To do: share credentials state so its aready prefilled when navigated to sign in
-      setTimeout(() => navigate("/LogIn"), 2000);
+      setTimeout(
+        () =>
+          navigate("/LogIn", {
+            state: { prefill: userCredentials.user.email },
+          }),
+        1000
+      );
     } catch (error) {
-       const errorMessages = {
-         "auth/user-not-found": "No account found with this email.",
-         "auth/wrong-password": "Incorrect password. Try again!",
-         "auth/invalid-email": "Invalid email format.",
-         "auth/user-disabled": "This account has been disabled.",
-         "auth/too-many-requests": "Too many failed attempts. Try again later.",
-       };
+      const errorMessages = {
+        "auth/user-not-found": "No account found with this email.",
+        "auth/wrong-password": "Incorrect password. Try again!",
+        "auth/invalid-email": "Invalid email format.",
+        "auth/user-disabled": "This account has been disabled.",
+        "auth/too-many-requests": "Too many failed attempts. Try again later.",
+      };
 
-       // Default to Firebase error message if no custom message is found
-       const errorMessage = errorMessages[error.code] || error.message;
+      // Default to Firebase error message if no custom message is found
+      const errorMessage = errorMessages[error.code] || error.message;
 
       setError(errorMessage);
       setIsLoading(false);
@@ -133,6 +147,15 @@ const Register = () => {
                 autoFocus
                 error={usernameError}
                 onChange={handleChange}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="start">
+                        <PermIdentityIcon/>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
               />
               <TextField
                 margin="normal"
@@ -147,6 +170,15 @@ const Register = () => {
                 onChange={handleChange}
                 error={emailError}
                 helperText={emailError ? "Email is required" : ""}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="start">
+                        <MailOutlineIcon />
+                      </InputAdornment>
+                    ),
+                  },
+                }}
               />
               <TextField
                 margin="normal"
@@ -154,7 +186,7 @@ const Register = () => {
                 fullWidth
                 name="password"
                 label="Password"
-                type="password"
+                type={showPwd ? "text" : "password"}
                 id="password"
                 autoComplete="current-password"
                 error={passwordError}
@@ -162,6 +194,19 @@ const Register = () => {
                 helperText={
                   passwordError ? "Passwords must be atleast 6 characters" : ""
                 }
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment
+                        position="start"
+                        onClick={handleVisibility}
+                        sx={{ cursor: "pointer" }}
+                      >
+                        {showPwd ? <Visibility /> : <VisibilityOff />}
+                      </InputAdornment>
+                    ),
+                  },
+                }}
               />
               <Button
                 type="submit"
