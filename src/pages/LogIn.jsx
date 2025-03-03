@@ -7,8 +7,8 @@ import {
   Paper,
 } from "@mui/material";
 import { CredentialStyle } from "../components/Utils";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase/config";
 import ErrorComp from "../components/ErrorComp";
@@ -28,7 +28,16 @@ const LogIn = () => {
   const [error, setError] = useState("");
   const [showPwd, setShowPwd] = useState(false);
   const navigate = useNavigate();
-
+  const location = useLocation();
+  useEffect(() => {
+    if (location.state?.prefill) {
+      setCredentials((prev) => ({
+        ...prev,
+        email: location.state.prefill,
+        password: "",
+      }));
+    }
+  }, [location.state]);
   function handleChange(e) {
     setError("");
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
@@ -39,12 +48,9 @@ const LogIn = () => {
 
   async function handleSubmit(e) {
     e.preventDefault();
-
-    if (!credentials.email.trim() && !credentials.password.trim()) {
-      return;
-    }
     setEmailError(false);
     setPasswordError(false);
+
     if (!credentials.email.trim()) {
       setEmailError(true);
     }
@@ -52,6 +58,9 @@ const LogIn = () => {
       setPasswordError(true);
     }
     if (!credentials.email.trim() || !credentials.password.trim()) {
+      return;
+    }
+    if (!credentials.email.trim() && !credentials.password.trim()) {
       return;
     }
     try {
@@ -78,7 +87,7 @@ const LogIn = () => {
           popup: "swal-popup",
         },
       });
-      setTimeout(() => navigate("/"), 2000);
+      setTimeout(() => navigate("/"), 1000);
     } catch (error) {
       const errorMessages = {
         "auth/user-not-found": "No account found with this email.",
@@ -107,92 +116,100 @@ const LogIn = () => {
     }
   }
   return (
-    <Container component="main" maxWidth="xs">
-      <Box sx={CredentialStyle.center}>
-        <Typography
-          component="h1"
-          variant="h5"
-          align="center"
-          color="primary"
-          sx={{ mb: 2 }}
-        >
-          FYRENOTES
-        </Typography>
-        <Paper elevation={3} sx={{ padding: 3 }}>
-          <Typography component="h1" variant="h5" align="center">
-            Login
+    <Box sx={CredentialStyle.gradient}>
+      <Box sx={{ ...CredentialStyle.blob, top: "10%", left: "15%" }} />
+      <Box sx={{ ...CredentialStyle.blob, bottom: "10%", right: "15%" }} />
+
+      <Container component="main" maxWidth="xs">
+        <Box sx={CredentialStyle.center}>
+          <Typography
+            component="h1"
+            variant="h5"
+            align="center"
+            sx={{ mb: 2, color: "white" }}
+          >
+            FYRENOTES
           </Typography>
-          <Box sx={{ mt: 1 }}>
-            <form noValidate autoComplete="off" onSubmit={handleSubmit}>
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email"
-                name="email"
-                autoComplete="email"
-                autoFocus
-                value={credentials.email}
-                onChange={handleChange}
-                error={emailError}
-                helperText={emailError ? "Email is required" : ""}
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <InputAdornment position="start">
-                        <MailOutlineIcon />
-                      </InputAdornment>
-                    ),
-                  },
-                }}
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type={showPwd ? "text" : "password"}
-                id="password"
-                autoComplete="current-password"
-                error={passwordError}
-                onChange={handleChange}
-                helperText={
-                  passwordError ? "Passwords must be atleast 6 characters" : ""
-                }
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <InputAdornment
-                        position="start"
-                        onClick={handleVisibility}
-                        sx={{ cursor: "pointer" }}
-                      >
-                        {showPwd ? <Visibility /> : <VisibilityOff />}
-                      </InputAdornment>
-                    ),
-                  },
-                }}
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                sx={{ mt: 3, mb: 2 }}
-              >
-                Login
-              </Button>
-              {error && <ErrorComp error={error} />}
-              <Typography component="h3" variant="subtitle1" align="center">
-                Don&apos;t have an account? <Link to="/Register">Register</Link>
-              </Typography>
-            </form>
-          </Box>
-        </Paper>
-      </Box>
-    </Container>
+
+          <Paper elevation={3} sx={{ padding: 3 }}>
+            <Typography component="h1" variant="h5" align="center" color="primary">
+              Login
+            </Typography>
+            <Box sx={{ mt: 1 }}>
+              <form noValidate autoComplete="off" onSubmit={handleSubmit}>
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email"
+                  name="email"
+                  autoComplete="email"
+                  autoFocus
+                  value={credentials.email}
+                  onChange={handleChange}
+                  error={emailError}
+                  helperText={emailError ? "Email is required" : ""}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="start">
+                          <MailOutlineIcon />
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                />
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type={showPwd ? "text" : "password"}
+                  id="password"
+                  autoComplete="current-password"
+                  error={passwordError}
+                  onChange={handleChange}
+                  helperText={
+                    passwordError
+                      ? "Passwords must be atleast 6 characters"
+                      : ""
+                  }
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment
+                          position="start"
+                          onClick={handleVisibility}
+                          sx={{ cursor: "pointer" }}
+                        >
+                          {showPwd ? <Visibility /> : <VisibilityOff />}
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                />
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  sx={{ mt: 3, mb: 2 }}
+                >
+                  Login
+                </Button>
+                {error && <ErrorComp error={error} />}
+                <Typography component="h3" variant="subtitle1" align="center">
+                  Don&apos;t have an account?{" "}
+                  <Link to="/Register">Register</Link>
+                </Typography>
+              </form>
+            </Box>
+          </Paper>
+        </Box>
+      </Container>
+    </Box>
   );
 };
 
