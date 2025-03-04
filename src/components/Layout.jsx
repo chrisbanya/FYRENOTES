@@ -5,7 +5,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemButton from "@mui/material/ListItemButton";
-import { ListItemText } from "@mui/material";
+import { ListItemText, IconButton } from "@mui/material";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import menuItems from "./MenuItems";
 import { LayoutClasses } from "./Utils";
@@ -17,11 +17,25 @@ import { auth, db } from "../firebase/config";
 import { doc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect, useCallback } from "react";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
+import { Menu as MenuIcon } from "@mui/icons-material";
+
+// const drawerWidth = 240;
+
 const Layout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [username, setUsername] = useState("");
   const [user, setUser] = useState(null);
+  // responsive drawer refs
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
   // gets the username ref initiated on register component
   const fetchUsername = useCallback(async (user) => {
@@ -43,10 +57,63 @@ const Layout = () => {
     return () => unsubscribe();
   }, [fetchUsername]);
 
+    const drawerContent = (
+      <Box sx={{ width: 240 }}>
+        {isMobile && (
+          <Typography
+            variant="h5"
+            sx={{ marginTop: "4rem", paddingLeft: "18px" }}
+            color="secondary"
+          >
+            FYRENOTES
+          </Typography>
+        )}
+        <List>
+          {!isMobile && (
+            <Typography
+              variant="h5"
+              sx={{ marginTop: "4rem",  }}
+            >
+            </Typography>
+          )}
+          {menuItems.map((lists) => (
+            <ListItem key={lists.text} disablePadding>
+              <ListItemButton
+                onClick={() => {
+                  navigate(lists.path);
+                  if (isMobile) setMobileOpen(false); // Close drawer on mobile after navigation
+                }}
+                selected={location.pathname === lists.path}
+              >
+                <ListItemIcon>{lists.icon}</ListItemIcon>
+                <ListItemText primary={lists.text} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Box>
+    );
+
   return (
     <Box sx={LayoutClasses.root}>
+      {/* Top App Bar */}
       <AppBar sx={LayoutClasses.appBar}>
         <Toolbar>
+          {/* Show Menu Icon only on mobile */}
+          {isMobile && (
+            <IconButton
+              onClick={handleDrawerToggle}
+              color="inherit"
+              edge="start"
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
+          {!isMobile && (
+            <Typography variant="h5" sx={LayoutClasses.title} >
+              FYRENOTES
+            </Typography>
+          )}
           <Stack
             direction="row"
             sx={{
@@ -55,14 +122,11 @@ const Layout = () => {
               width: "100%",
             }}
           >
-            {/* <Box>
-              <Typography>Welcome to DevChris notes website</Typography>
-            </Box> */}
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
-                gap: "2rem",
+                gap: "1rem",
               }}
             >
               <Typography>Hello, {username ? username : "Guest"}</Typography>
@@ -71,32 +135,20 @@ const Layout = () => {
           </Stack>
         </Toolbar>
       </AppBar>
-      {/* margin between appBar and content */}
-      <Box sx={LayoutClasses.toolbar}></Box>
 
-      <Drawer sx={LayoutClasses.drawer} variant="permanent" anchor="left">
-        <div>
-          <Typography variant="h5" sx={LayoutClasses.title} color="secondary">
-            FYRENOTES
-          </Typography>
-        </div>
-        {/* sidebar list items */}
-        <List>
-          {menuItems.map((lists) => (
-            <ListItem key={lists.text}>
-              <ListItemButton
-                onClick={() => navigate(lists.path)}
-                selected={location.pathname === lists.path}
-              >
-                <ListItemIcon>{lists.icon}</ListItemIcon>
-                <ListItemText>{lists.text}</ListItemText>
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
+      {/* Sidebar Drawer (Permanent for Desktop, Temporary for Mobile) */}
+      <Drawer
+        sx={LayoutClasses.drawer}
+        variant={isMobile ? "temporary" : "permanent"}
+        // anchor="left"
+        open={isMobile ? mobileOpen : true}
+        onClose={handleDrawerToggle} // Close when clicking outside on mobile
+        ModalProps={{ keepMounted: true }} // Improves performance on mobile
+      >
+        {drawerContent}
       </Drawer>
-      {/* outlet for create and notes pages */}
 
+      {/* Main Content */}
       <Box sx={LayoutClasses.layoutEffect}>
         <Outlet />
       </Box>
