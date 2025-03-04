@@ -16,21 +16,23 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { db } from "../firebase/config";
+import { Box } from "@mui/material";
+
 
 import NoteCard from "../components/NoteCard";
 
 export const Notes = () => {
   const [notes, setNotes] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [user, setUser] =useState(null)
-  
+  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(null);
+
   // prevents empty notes on re-render or page refresh
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
     return () => unsubscribe();
-  }, [])
+  }, []);
 
   useEffect(() => {
     // check for if the user is authenicated else stop the process
@@ -111,7 +113,17 @@ export const Notes = () => {
         sequential
       >
         {isLoading ? (
-          <CircularProgress />
+          <Box
+            sx={{
+              gridColumn: "1 / -1", // Spans across all columns in Masonry by countering mansory fixed width effect on children elements
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: 2,
+            }}
+          >
+            <CircularProgress />
+          </Box>
         ) : notes.length > 0 ? (
           notes.map((note) => (
             <NoteCard key={note.id} note={note} handleDelete={handleDelete} />
