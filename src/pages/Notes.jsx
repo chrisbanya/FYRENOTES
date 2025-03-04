@@ -23,7 +23,7 @@ import NoteCard from "../components/NoteCard";
 
 export const Notes = () => {
   const [notes, setNotes] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState(null);
 
   // prevents empty notes on re-render or page refresh
